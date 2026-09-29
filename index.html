@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="FoMoD distills future force and motion into robot policies for contact-rich manipulation.">
+  <meta name="keywords" content="FoMoD, world action model, contact-rich manipulation, force sensing, motion distillation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FoMoD: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+<section class="hero publication-header">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            <span class="title-mark">FoMoD</span>: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation
+          </h1>
+          <p class="subtitle is-4 publication-subtitle">
+            Physical foresight without pixel-space future prediction.
+          </p>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Peiyuan Tang<sup>1*</sup></span>
+            <span class="author-block">Yao Li<sup>2*</sup></span>
+            <span class="author-block">Xiaodong Zhang<sup>2†</sup></span>
+            <span class="author-block">Wuyang Zhang<sup>2</sup></span>
+            <span class="author-block">Qin Xia<sup>1</sup></span>
+            <span class="author-block">Yanyong Zhang<sup>2</sup></span>
+            <span class="author-block">Zijiang James Yang<sup>2,3†</sup></span>
+          </div>
+          <div class="publication-affiliations">
+            <p><sup>1</sup> School of Computer Science and Technology, Xi'an Jiaotong University</p>
+            <p><sup>2</sup> School of Computer Science and Technology, University of Science and Technology of China</p>
+            <p><sup>3</sup> Synkrotron, Inc.</p>
+            <p class="publication-notes"><sup>*</sup> Equal contribution. &nbsp; <sup>†</sup> Corresponding authors.</p>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="./static/paper/fomod.pdf" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>BibTeX</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a class="external-link button is-normal is-rounded is-light is-disabled">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code coming soon</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#method" class="external-link button is-normal is-rounded is-light">
+                  <span class="icon"><i class="fas fa-project-diagram"></i></span>
+                  <span>Method</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#rollouts" class="external-link button is-normal is-rounded is-light">
+                  <span class="icon"><i class="fas fa-play"></i></span>
+                  <span>Rollouts</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop abstract-container">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            World-action models improve robotic manipulation by predicting future scene evolution to guide policy
+            learning. However, existing approaches typically model such evolution through pixel-space video prediction,
+            which entangles task-relevant dynamics with irrelevant lighting and texture. Moreover, visual prediction
+            struggles to capture future contact information, thereby limiting its applicability to contact-rich tasks.
+            Our key insight is that future force and motion provide a more physically grounded representation of
+            interaction dynamics, yielding more informative cues for action prediction in contact-rich manipulation.
+          </p>
+          <p>
+            However, directly predicting raw force and motion signals is both difficult and unnecessary, as it requires
+            precise reconstruction of noisy, task-irrelevant details. To address this issue, we propose
+            <span class="method-name">Force-and-Motion Distillation (FoMoD)</span>, a framework that distills future
+            contact and motion dynamics into the policy. FoMoD adopts a teacher-student distillation framework, in which
+            privileged teachers extract compact, action-relevant representations from future sensor signals and distill
+            them into a student model. This design not only makes future dynamics easier to predict but also encourages
+            the model to focus on control-relevant information rather than on irrelevant details.
+          </p>
+          <p>
+            To further improve robustness and generalization, we introduce a curriculum-based strategy that
+            progressively injects noise into future queries, thereby reducing the model's reliance on future information.
+            We evaluate FoMoD on five real-world contact-rich manipulation tasks. Experiments show that FoMoD achieves
+            state-of-the-art performance, consistently improves task success rates, and generalizes effectively to novel
+            environments.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-fluid motivation-container">
+    <div class="hero-body">
+      <div class="section-heading has-text-centered">
+        <h2 class="title is-3 section-title">Motivation</h2>
+        <p class="section-subtitle">Why move beyond video-based world action models?</p>
+        <div class="motivation-points">
+          <div class="motivation-point">
+            <span class="motivation-number">01</span>
+            <div>
+              <h3>Physical data do not scale like video</h3>
+              <p>
+                Large video corpora rarely include synchronized force or tactile feedback, while real robot interaction
+                data remain scarce.
+              </p>
+            </div>
+          </div>
+          <div class="motivation-point">
+            <span class="motivation-number">02</span>
+            <div>
+              <h3>Future-video prediction is too slow</h3>
+              <p>
+                Contact-rich manipulation requires high-frequency control, but generating future video adds substantial
+                inference latency.
+              </p>
+            </div>
+          </div>
+          <div class="motivation-point motivation-point-accent">
+            <span class="motivation-number">03</span>
+            <div>
+              <h3>Pixel-space prediction may emphasize the wrong details</h3>
+              <p>
+                Pixel prediction can entangle dynamics with lighting, texture, and background. FoMoD instead distills
+                compact future force and motion cues that matter for action generation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="figure-crop figure-crop-1">
+        <img src="./static/images/figure1.png" alt="Comparison of force-aware VLA, video-based world action models, and FoMoD.">
+        <span class="figure-1-method-label" aria-hidden="true">(c) FoMoD (Ours)</span>
+      </div>
+      <p class="figure-caption has-text-left">
+        <strong>Figure 1.</strong> Conceptual comparison. Force-aware VLAs react directly from current observations,
+        while video-based world action models explicitly predict future frames. FoMoD distills future force and motion
+        into a student policy, providing physical foresight without future prediction at deployment.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint" id="method">
+  <div class="container is-fluid figure-container">
+    <div class="section-heading has-text-centered">
+      <h2 class="title is-3 section-title">Method</h2>
+      <p class="section-subtitle">Distill physical foresight without predicting pixels</p>
+      <p class="section-lead">
+        FoMoD transfers compact future force and motion representations from privileged teachers to a deployable student.
+      </p>
+    </div>
+    <div class="content has-text-justified method-summary">
+      <p>
+        FoMoD uses future force/torque and optical flow as privileged supervision rather than explicit prediction
+        targets. Online future-dynamics distillation transfers their action-relevant latent representations to a student,
+        while progressive query perturbation improves robustness. At inference time, the teachers and all future signals
+        are discarded.
+      </p>
+    </div>
+    <div class="figure-crop figure-crop-2">
+      <img src="./static/images/figure2.png" alt="Overview of FoMoD.">
+    </div>
+    <p class="figure-caption has-text-left">
+      <strong>Figure 2.</strong> Overview of our proposed FoMoD. It consists of (a) a teacher-student distillation
+      framework that transfers future-aware dynamics representations to the student policy, (b) a future dynamics
+      encoder that converts future force and optical flow into force and motion tokens, and (c) progressive noise
+      injection that adds scheduled noise to the student's latent queries to improve generalization.
+    </p>
+
+    <div class="columns is-variable is-5 method-grid">
+      <div class="column">
+        <div class="info-card">
+          <span class="card-number">01</span>
+          <h3 class="title is-5">Privileged Force Encoding</h3>
+          <p>
+            Future 6D wrench measurements provide direct supervision for contact onset, resistance, sliding, and
+            force buildup.
+          </p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="info-card">
+          <span class="card-number">02</span>
+          <h3 class="title is-5">Privileged Motion Encoding</h3>
+          <p>
+            Optical flow captures robot and object motion without forcing the model to reconstruct redundant RGB details.
+          </p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="info-card">
+          <span class="card-number">03</span>
+          <h3 class="title is-5">Online Dynamics Distillation</h3>
+          <p>
+            Student latent queries are aligned with teacher dynamics representations, enabling future-aware reasoning
+            from causal inputs.
+          </p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="info-card">
+          <span class="card-number">04</span>
+          <h3 class="title is-5">Progressive Query Perturbation</h3>
+          <p>
+            A curriculum gradually perturbs student queries, preventing shortcut dependence on privileged teacher features.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="deployment-note">
+      <span class="deployment-badge">Inference</span>
+      <p><strong>Teacher-free and future-free.</strong> Only the student branch and current observations are retained at deployment.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-fluid figure-container">
+    <h2 class="title is-3 has-text-centered">Real-World Tasks</h2>
+    <div class="content has-text-justified">
+      <p>
+        We evaluate on a 7-DoF xArm7 manipulator with a wrist-mounted 6D force/torque sensor, a wrist camera, and a
+        fixed external camera. The benchmark covers precise insertion, rigid-body assembly, object reorientation, and
+        sustained surface contact.
+      </p>
+    </div>
+    <div class="figure-crop figure-crop-3">
+      <img src="./static/images/figure3.png" alt="Five real-world contact-rich manipulation tasks.">
+    </div>
+    <p class="figure-caption has-text-centered">
+      <strong>Figure 3.</strong> Five real-world contact-rich manipulation tasks used in our experiments.
+    </p>
+
+    <div class="task-list">
+      <span>USB Insertion</span>
+      <span>Gear Assembly</span>
+      <span>Box Flipping</span>
+      <span>Board Wiping</span>
+      <span>VGA Plugging</span>
+    </div>
+  </div>
+</section>
+
+<section class="section rollouts-section" id="rollouts">
+  <div class="container is-fluid rollout-container">
+    <div class="section-heading has-text-centered">
+      <h2 class="title is-3 section-title">Real-world Evidence</h2>
+      <p class="section-subtitle">Contact-rich rollouts across five tasks</p>
+    </div>
+    <div class="content has-text-centered rollout-intro">
+      <p>
+        In-distribution successes, unseen conditions, perturbations, and representative failures. Videos load only as
+        they approach the viewport for a faster page.
+      </p>
+    </div>
+
+    <div class="rollout-task">
+      <h3 class="title is-4">USB Insertion</h3>
+      <div class="rollout-grid">
+        <div class="video-slot" data-label="ID · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/USB_ID_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/USB_ID_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="Perturbation · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/USB_perturbation_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="Perturbation · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/USB_perturbation_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot failure-slot" data-label="ID · Failure"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/USB_ID_failure_1.mp4" type="video/mp4"></video></div>
+      </div>
+    </div>
+
+    <div class="rollout-task">
+      <h3 class="title is-4">Gear Assembly</h3>
+      <div class="rollout-grid">
+        <div class="video-slot" data-label="ID · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Gear_ID_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Gear_ID_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="OOD · Success"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Gear_OOD_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="Perturbation · Success"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Gear_perturbation_success1_.mp4" type="video/mp4"></video></div>
+        <div class="video-slot failure-slot" data-label="ID · Failure"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Gear_ID_failure_1.mp4" type="video/mp4"></video></div>
+      </div>
+    </div>
+
+    <div class="rollout-task">
+      <h3 class="title is-4">Box Flipping</h3>
+      <div class="rollout-grid">
+        <div class="video-slot" data-label="ID · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Box_ID_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Box_ID_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="OOD · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Box_OOD_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="OOD · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Box_OOD_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot failure-slot" data-label="OOD · Failure"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/Box_OOD_failure_1.mp4" type="video/mp4"></video></div>
+      </div>
+    </div>
+
+    <div class="rollout-task">
+      <h3 class="title is-4">Board Wiping</h3>
+      <div class="rollout-grid">
+        <div class="video-slot" data-label="ID · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/wiping_ID_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/wiping_ID_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="OOD · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/wiping_OOD_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="OOD · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/wiping_OOD_sucess2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot failure-slot" data-label="ID · Failure"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/wiping_ID_failed_1.mp4" type="video/mp4"></video></div>
+      </div>
+    </div>
+
+    <div class="rollout-task">
+      <h3 class="title is-4">VGA Plugging</h3>
+      <div class="rollout-grid">
+        <div class="video-slot" data-label="ID · Success 01"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/vga_ID_success_1.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 02"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/vga_ID_success_2.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 03"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/vga_ID_success_3.mp4" type="video/mp4"></video></div>
+        <div class="video-slot" data-label="ID · Success 04"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/vga_ID_success_4.mp4" type="video/mp4"></video></div>
+        <div class="video-slot failure-slot" data-label="ID · Failure"><video muted loop playsinline controls preload="none"><source data-src="./videos_web/vga_ID_failure_1.mp4" type="video/mp4"></video></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container is-fluid figure-container">
+    <h2 class="title is-3 has-text-centered">Results</h2>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="result-card">
+          <div class="result-number">87.1%</div>
+          <div class="result-label">Average ID success rate</div>
+          <p>Best overall performance across five real-world contact-rich tasks.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="result-card">
+          <div class="result-number">68.9%</div>
+          <div class="result-label">Average OOD success rate</div>
+          <p>Improves over the strongest OOD baseline by 20.0 percentage points.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="result-card">
+          <div class="result-number">85.0%</div>
+          <div class="result-label">VGA Plugging success rate</div>
+          <p>Large gains on high-precision insertion requiring fine force-aware correction.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="title is-4">Main Results</h3>
+    <div class="table-container">
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <caption class="table-caption">
+          <strong>Table 1.</strong> Performance comparison on In-Distribution (ID) contact-rich manipulation tasks.
+          We report the success rate (%) across different tasks. Avg. denotes the average success rate across all ID
+          evaluation settings. Best results are highlighted in <strong>bold</strong>.
+        </caption>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>USB</th>
+            <th>Gear</th>
+            <th>Box</th>
+            <th>Wiping</th>
+            <th>VGA</th>
+            <th>Avg.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>pi0 w/o force</td><td>44.0</td><td>46.7</td><td>55.0</td><td>60.0</td><td>0.0</td><td>41.1</td></tr>
+          <tr><td>pi0 w/ force</td><td>64.0</td><td>83.3</td><td>70.0</td><td>70.0</td><td>5.0</td><td>58.5</td></tr>
+          <tr><td>TA-VLA</td><td>80.0</td><td><strong>93.3</strong></td><td>80.0</td><td>75.0</td><td>10.0</td><td>67.7</td></tr>
+          <tr><td>ForceVLA</td><td>52.0</td><td>66.7</td><td>65.0</td><td>65.0</td><td>5.0</td><td>50.7</td></tr>
+          <tr><td>Seer w/ Force</td><td>76.0</td><td>70.0</td><td><strong>95.0</strong></td><td>70.0</td><td>50.0</td><td>72.2</td></tr>
+          <tr class="ours-row"><td><strong>FoMoD</strong></td><td><strong>92.0</strong></td><td>83.3</td><td><strong>95.0</strong></td><td><strong>80.0</strong></td><td><strong>85.0</strong></td><td><strong>87.1</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="title is-4">Out-of-Distribution Generalization</h3>
+    <div class="figure-crop figure-crop-4">
+      <img src="./static/images/figure4.png" alt="Out-of-distribution evaluation settings.">
+    </div>
+    <p class="figure-caption has-text-centered">
+      <strong>Figure 4.</strong> Out-of-distribution generalization settings used in our real-world evaluation.
+    </p>
+    <div class="table-container">
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <caption class="table-caption">
+          <strong>Table 2.</strong> Generalization performance on Out-of-Distribution (OOD) contact-rich manipulation
+          tasks. We report the success rate (%). Avg. denotes the average success rate across all OOD evaluation
+          settings. Best results are highlighted in <strong>bold</strong>.
+        </caption>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>USB Obj.</th>
+            <th>USB Occ.</th>
+            <th>Gear Height</th>
+            <th>Gear Color</th>
+            <th>Box Mat.</th>
+            <th>Box Shape</th>
+            <th>Avg.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>pi0 w/o force</td><td>20.0</td><td>26.7</td><td>0.0</td><td>40.0</td><td>26.7</td><td>0.0</td><td>18.9</td></tr>
+          <tr><td>pi0 w/ force</td><td>40.0</td><td>73.3</td><td>0.0</td><td>46.7</td><td>26.7</td><td>33.3</td><td>36.7</td></tr>
+          <tr><td>TA-VLA</td><td>20.0</td><td>66.7</td><td>13.3</td><td><strong>66.7</strong></td><td>13.3</td><td>26.7</td><td>34.5</td></tr>
+          <tr><td>ForceVLA</td><td>26.7</td><td>20.0</td><td>0.0</td><td>40.0</td><td>0.0</td><td>16.7</td><td>17.2</td></tr>
+          <tr><td>Seer w/ Force</td><td>46.7</td><td>20.0</td><td><strong>53.3</strong></td><td>60.0</td><td>73.3</td><td>40.0</td><td>48.9</td></tr>
+          <tr class="ours-row"><td><strong>FoMoD</strong></td><td><strong>86.7</strong></td><td><strong>86.7</strong></td><td>46.7</td><td>60.0</td><td><strong>80.0</strong></td><td><strong>53.3</strong></td><td><strong>68.9</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Key Findings</h2>
+    <div class="content has-text-justified">
+      <ul>
+        <li>Future force and optical flow provide physically grounded supervision that pixel-space prediction misses.</li>
+        <li>Latent distillation gives the student physical foresight without explicit future-video generation or future inputs at deployment.</li>
+        <li>Progressive query perturbation improves robustness when future dynamics must be inferred from current observations alone.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{tang2026fomod,
+  title  = {FoMoD: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation},
+  author = {Tang, Peiyuan and Li, Yao and Zhang, Xiaodong and Zhang, Wuyang and Xia, Qin and Zhang, Yanyong and Yang, Zijiang James},
+  year   = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="./static/paper/fomod.pdf">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>Project page for FoMoD.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const rolloutVideos = document.querySelectorAll('.video-slot video');
+  const videoObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target;
+      if (entry.isIntersecting) {
+        const source = video.querySelector('source[data-src]');
+        if (source) {
+          source.src = source.dataset.src;
+          source.removeAttribute('data-src');
+          video.load();
+        }
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, { rootMargin: '240px 0px', threshold: 0.15 });
+
+  rolloutVideos.forEach((video) => videoObserver.observe(video));
+</script>
+</body>
+</html>

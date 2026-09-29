@@ -1,0 +1,5 @@
+.DS_store
+.idea
+
+# Keep full-resolution source videos local; publish videos_web instead.
+/videos/
