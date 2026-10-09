@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="FoMoD distills future force and motion into robot policies for contact-rich manipulation.">
-  <meta name="keywords" content="FoMoD, world action model, contact-rich manipulation, force sensing, motion distillation">
+  <meta name="description" content="ForceLDM is a force-aware latent dynamics model for contact-rich robotic manipulation.">
+  <meta name="keywords" content="ForceLDM, contact-rich manipulation, vision-language-action, force sensing, latent dynamics">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FoMoD: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation</title>
+  <title>ForceLDM: A Force-aware Latent Dynamics Model for Contact-Rich Manipulation</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="icon" href="./static/images/favicon.svg">
@@ -23,32 +24,23 @@
       <div class="columns is-centered">
         <div class="column has-text-centered">
           <h1 class="title is-1 publication-title">
-            <span class="title-mark">FoMoD</span>: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation
+            <span class="title-mark">ForceLDM</span>: A Force-aware Latent Dynamics Model for Contact-Rich Manipulation
           </h1>
           <p class="subtitle is-4 publication-subtitle">
-            Physical foresight without pixel-space future prediction.
+            Learning Future Dynamics through Teacher–Student Distillation.
           </p>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block">Peiyuan Tang<sup>1*</sup></span>
-            <span class="author-block">Yao Li<sup>2*</sup></span>
-            <span class="author-block">Xiaodong Zhang<sup>2†</sup></span>
-            <span class="author-block">Wuyang Zhang<sup>2</sup></span>
-            <span class="author-block">Qin Xia<sup>1</sup></span>
-            <span class="author-block">Yanyong Zhang<sup>2</sup></span>
-            <span class="author-block">Zijiang James Yang<sup>2,3†</sup></span>
+            <span class="author-block">Anonymous Authors</span>
           </div>
-          <div class="publication-affiliations">
-            <p><sup>1</sup> School of Computer Science and Technology, Xi'an Jiaotong University</p>
-            <p><sup>2</sup> School of Computer Science and Technology, University of Science and Technology of China</p>
-            <p><sup>3</sup> Synkrotron, Inc.</p>
-            <p class="publication-notes"><sup>*</sup> Equal contribution. &nbsp; <sup>†</sup> Corresponding authors.</p>
+          <div class="is-size-6 publication-authors">
+            <span class="author-block">Paper under review</span>
           </div>
 
           <div class="column has-text-centered">
             <div class="publication-links">
               <span class="link-block">
-                <a href="./static/paper/fomod.pdf" class="external-link button is-normal is-rounded is-dark">
+                <a href="./static/paper/forceldm.pdf" class="external-link button is-normal is-rounded is-dark">
                   <span class="icon"><i class="fas fa-file-pdf"></i></span>
                   <span>Paper</span>
                 </a>
@@ -92,28 +84,29 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            World-action models improve robotic manipulation by predicting future scene evolution to guide policy
-            learning. However, existing approaches typically model such evolution through pixel-space video prediction,
-            which entangles task-relevant dynamics with irrelevant lighting and texture. Moreover, visual prediction
-            struggles to capture future contact information, thereby limiting its applicability to contact-rich tasks.
-            Our key insight is that future force and motion provide a more physically grounded representation of
-            interaction dynamics, yielding more informative cues for action prediction in contact-rich manipulation.
+            Contact-rich manipulation requires precise control and complex physical interaction with the environment,
+            posing significant challenges for robot policy learning. Vision-only policies struggle with such tasks, as
+            contact states and force feedback are difficult to infer from vision alone. Existing methods mitigate this
+            issue by incorporating force or tactile sensing. However, they often treat these signals as auxiliary
+            observations rather than using them to model future interaction dynamics, leading to inefficient modality
+            utilization and limited generalization.
           </p>
           <p>
-            However, directly predicting raw force and motion signals is both difficult and unnecessary, as it requires
-            precise reconstruction of noisy, task-irrelevant details. To address this issue, we propose
-            <span class="method-name">Force-and-Motion Distillation (FoMoD)</span>, a framework that distills future
-            contact and motion dynamics into the policy. FoMoD adopts a teacher-student distillation framework, in which
-            privileged teachers extract compact, action-relevant representations from future sensor signals and distill
-            them into a student model. This design not only makes future dynamics easier to predict but also encourages
-            the model to focus on control-relevant information rather than on irrelevant details.
+            To address this, we propose <span class="method-name">ForceLDM</span>, a force-aware latent dynamics model
+            that enables the policy to anticipate future contact and motion dynamics in latent space and use them to
+            guide action generation. Rather than predicting future observations in pixel space, which often requires
+            large amounts of data and risk overfitting irrelevant details, ForceLDM learns a compact task-relevant
+            representation through knowledge distillation. Specifically, a teacher network with privileged access to
+            future force/torque and optical flow signals extracts future dynamic features, which are then distilled into
+            a student network trained only on current observations.
           </p>
           <p>
-            To further improve robustness and generalization, we introduce a curriculum-based strategy that
-            progressively injects noise into future queries, thereby reducing the model's reliance on future information.
-            We evaluate FoMoD on five real-world contact-rich manipulation tasks. Experiments show that FoMoD achieves
-            state-of-the-art performance, consistently improves task success rates, and generalizes effectively to novel
-            environments.
+            This enables the student to reason about upcoming contacts and physical dynamics at deployment without
+            relying on future sensory inputs. To improve robustness and generalization, we further introduce a
+            curriculum-based progressive noise injection strategy to mitigate over-reliance on future features.
+            Experiments on five real-world contact-rich manipulation tasks demonstrate that ForceLDM significantly
+            outperforms state-of-the-art baselines, generalizes effectively to novel objects, and remains robust to
+            environmental perturbations.
           </p>
         </div>
       </div>
@@ -126,48 +119,48 @@
     <div class="hero-body">
       <div class="section-heading has-text-centered">
         <h2 class="title is-3 section-title">Motivation</h2>
-        <p class="section-subtitle">Why move beyond video-based world action models?</p>
+        <p class="section-subtitle">Why learn future interaction dynamics importantly?</p>
         <div class="motivation-points">
           <div class="motivation-point">
             <span class="motivation-number">01</span>
             <div>
-              <h3>Physical data do not scale like video</h3>
+              <h3>Direct force conditioning is not enough</h3>
               <p>
-                Large video corpora rarely include synchronized force or tactile feedback, while real robot interaction
-                data remain scarce.
+                Rich visual features can dominate sparse force signals, causing the policy to ignore physical feedback
+                and suffer from modality collapse.
               </p>
             </div>
           </div>
           <div class="motivation-point">
             <span class="motivation-number">02</span>
             <div>
-              <h3>Future-video prediction is too slow</h3>
+              <h3>From reactive control to anticipatory reasoning</h3>
               <p>
-                Contact-rich manipulation requires high-frequency control, but generating future video adds substantial
-                inference latency.
+                Observation-to-action policies only react to the present. Future dynamics let the policy anticipate
+                contact changes and reduce trajectory overfitting.
               </p>
             </div>
           </div>
           <div class="motivation-point motivation-point-accent">
             <span class="motivation-number">03</span>
             <div>
-              <h3>Pixel-space prediction may emphasize the wrong details</h3>
+              <h3>Implicit latent dynamics provide the right abstraction</h3>
               <p>
-                Pixel prediction can entangle dynamics with lighting, texture, and background. FoMoD instead distills
-                compact future force and motion cues that matter for action generation.
+                Predicting future RGB is costly and captures irrelevant details. Distilling future force and optical
+                flow yields compact, action-relevant dynamics.
               </p>
             </div>
           </div>
         </div>
       </div>
       <div class="figure-crop figure-crop-1">
-        <img src="./static/images/figure1.png" alt="Comparison of force-aware VLA, video-based world action models, and FoMoD.">
-        <span class="figure-1-method-label" aria-hidden="true">(c) FoMoD (Ours)</span>
+        <img src="./static/images/figure1.png" alt="Conceptual comparison between baseline policies and ForceLDM.">
       </div>
       <p class="figure-caption has-text-left">
-        <strong>Figure 1.</strong> Conceptual comparison. Force-aware VLAs react directly from current observations,
-        while video-based world action models explicitly predict future frames. FoMoD distills future force and motion
-        into a student policy, providing physical foresight without future prediction at deployment.
+        <strong>Figure 1.</strong> Comparison between baseline methods and ForceLDM. Baselines directly map current
+        observations to actions, which can cause modality collapse and limited generalization, while ForceLDM
+        distills future force and motion representations to make the student learn physical interaction dynamics
+        that guide action generation.
       </p>
     </div>
   </div>
@@ -177,24 +170,25 @@
   <div class="container is-fluid figure-container">
     <div class="section-heading has-text-centered">
       <h2 class="title is-3 section-title">Method</h2>
-      <p class="section-subtitle">Distill physical foresight without predicting pixels</p>
+      <p class="section-subtitle">Distill future physical dynamics into a deployable policy</p>
       <p class="section-lead">
-        FoMoD transfers compact future force and motion representations from privileged teachers to a deployable student.
+        ForceLDM transfers compact future force and motion features from a privileged teacher to a student, using
+        progressive noise for robust deployment.
       </p>
     </div>
     <div class="content has-text-justified method-summary">
       <p>
-        FoMoD uses future force/torque and optical flow as privileged supervision rather than explicit prediction
-        targets. Online future-dynamics distillation transfers their action-relevant latent representations to a student,
-        while progressive query perturbation improves robustness. At inference time, the teachers and all future signals
-        are discarded.
+        ForceLDM guides action generation with latent physical dynamics. It first encodes future wrench sequences and
+        optical flow as compact force and motion tokens. A teacher-student distillation framework transfers privileged
+        future-aware dynamics into the student policy, while progressive noise injection regularizes the student latent
+        queries. At inference time, future signals and the teacher branch are discarded.
       </p>
     </div>
     <div class="figure-crop figure-crop-2">
-      <img src="./static/images/figure2.png" alt="Overview of FoMoD.">
+      <img src="./static/images/figure2.png" alt="Overview of ForceLDM.">
     </div>
     <p class="figure-caption has-text-left">
-      <strong>Figure 2.</strong> Overview of our proposed FoMoD. It consists of (a) a teacher-student distillation
+      <strong>Figure 2.</strong> Overview of our proposed ForceLDM. It consists of (a) a teacher-student distillation
       framework that transfers future-aware dynamics representations to the student policy, (b) a future dynamics
       encoder that converts future force and optical flow into force and motion tokens, and (c) progressive noise
       injection that adds scheduled noise to the student's latent queries to improve generalization.
@@ -204,7 +198,7 @@
       <div class="column">
         <div class="info-card">
           <span class="card-number">01</span>
-          <h3 class="title is-5">Privileged Force Encoding</h3>
+          <h3 class="title is-5">Future Force Encoding</h3>
           <p>
             Future 6D wrench measurements provide direct supervision for contact onset, resistance, sliding, and
             force buildup.
@@ -214,7 +208,7 @@
       <div class="column">
         <div class="info-card">
           <span class="card-number">02</span>
-          <h3 class="title is-5">Privileged Motion Encoding</h3>
+          <h3 class="title is-5">Future Motion Encoding</h3>
           <p>
             Optical flow captures robot and object motion without forcing the model to reconstruct redundant RGB details.
           </p>
@@ -223,7 +217,7 @@
       <div class="column">
         <div class="info-card">
           <span class="card-number">03</span>
-          <h3 class="title is-5">Online Dynamics Distillation</h3>
+          <h3 class="title is-5">Latent Distillation</h3>
           <p>
             Student latent queries are aligned with teacher dynamics representations, enabling future-aware reasoning
             from causal inputs.
@@ -233,7 +227,7 @@
       <div class="column">
         <div class="info-card">
           <span class="card-number">04</span>
-          <h3 class="title is-5">Progressive Query Perturbation</h3>
+          <h3 class="title is-5">Progressive Noise</h3>
           <p>
             A curriculum gradually perturbs student queries, preventing shortcut dependence on privileged teacher features.
           </p>
@@ -396,7 +390,7 @@
           <tr><td>TA-VLA</td><td>80.0</td><td><strong>93.3</strong></td><td>80.0</td><td>75.0</td><td>10.0</td><td>67.7</td></tr>
           <tr><td>ForceVLA</td><td>52.0</td><td>66.7</td><td>65.0</td><td>65.0</td><td>5.0</td><td>50.7</td></tr>
           <tr><td>Seer w/ Force</td><td>76.0</td><td>70.0</td><td><strong>95.0</strong></td><td>70.0</td><td>50.0</td><td>72.2</td></tr>
-          <tr class="ours-row"><td><strong>FoMoD</strong></td><td><strong>92.0</strong></td><td>83.3</td><td><strong>95.0</strong></td><td><strong>80.0</strong></td><td><strong>85.0</strong></td><td><strong>87.1</strong></td></tr>
+          <tr class="ours-row"><td><strong>ForceLDM</strong></td><td><strong>92.0</strong></td><td>83.3</td><td><strong>95.0</strong></td><td><strong>80.0</strong></td><td><strong>85.0</strong></td><td><strong>87.1</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -433,7 +427,7 @@
           <tr><td>TA-VLA</td><td>20.0</td><td>66.7</td><td>13.3</td><td><strong>66.7</strong></td><td>13.3</td><td>26.7</td><td>34.5</td></tr>
           <tr><td>ForceVLA</td><td>26.7</td><td>20.0</td><td>0.0</td><td>40.0</td><td>0.0</td><td>16.7</td><td>17.2</td></tr>
           <tr><td>Seer w/ Force</td><td>46.7</td><td>20.0</td><td><strong>53.3</strong></td><td>60.0</td><td>73.3</td><td>40.0</td><td>48.9</td></tr>
-          <tr class="ours-row"><td><strong>FoMoD</strong></td><td><strong>86.7</strong></td><td><strong>86.7</strong></td><td>46.7</td><td>60.0</td><td><strong>80.0</strong></td><td><strong>53.3</strong></td><td><strong>68.9</strong></td></tr>
+          <tr class="ours-row"><td><strong>ForceLDM</strong></td><td><strong>86.7</strong></td><td><strong>86.7</strong></td><td>46.7</td><td>60.0</td><td><strong>80.0</strong></td><td><strong>53.3</strong></td><td><strong>68.9</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -445,9 +439,9 @@
     <h2 class="title is-3 has-text-centered">Key Findings</h2>
     <div class="content has-text-justified">
       <ul>
-        <li>Future force and optical flow provide physically grounded supervision that pixel-space prediction misses.</li>
-        <li>Latent distillation gives the student physical foresight without explicit future-video generation or future inputs at deployment.</li>
-        <li>Progressive query perturbation improves robustness when future dynamics must be inferred from current observations alone.</li>
+        <li>Future force and optical flow are complementary: force captures contact evolution, while optical flow captures action-relevant motion and alignment.</li>
+        <li>Distilling latent future dynamics is more effective than predicting future RGB observations for contact-rich control.</li>
+        <li>Progressive noise injection improves robustness when the student must infer future dynamics from current observations alone.</li>
       </ul>
     </div>
   </div>
@@ -456,10 +450,11 @@
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
-    <pre><code>@misc{tang2026fomod,
-  title  = {FoMoD: Future Force-and-Motion Distillation Improves Contact-Rich Manipulation},
-  author = {Tang, Peiyuan and Li, Yao and Zhang, Xiaodong and Zhang, Wuyang and Xia, Qin and Zhang, Yanyong and Yang, Zijiang James},
-  year   = {2026}
+    <pre><code>@article{anonymous2026forcewam,
+  title   = {ForceWAM: A Force-aware Latent World Action Model for Contact-Rich Manipulation},
+  author  = {Anonymous Authors},
+  journal = {Under Review},
+  year    = {2026}
 }</code></pre>
   </div>
 </section>
@@ -467,14 +462,14 @@
 <footer class="footer">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link" href="./static/paper/fomod.pdf">
+      <a class="icon-link" href="./static/paper/forceldm.pdf">
         <i class="fas fa-file-pdf"></i>
       </a>
     </div>
     <div class="columns is-centered">
       <div class="column is-8">
         <div class="content has-text-centered">
-          <p>Project page for FoMoD.</p>
+          <p>Project page for ForceWAM / ForceLDM.</p>
         </div>
       </div>
     </div>
