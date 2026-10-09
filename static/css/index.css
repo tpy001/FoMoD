@@ -255,13 +255,11 @@ body {
 .figure-crop-1 {
   width: 100%;
   max-width: var(--content-width);
-  aspect-ratio: 1214 / 663;
 }
 
 .figure-crop-1 img {
-  top: -29.9%;
-  left: -24.3%;
-  width: 197.69%;
+  position: static;
+  width: 100%;
 }
 
 .figure-crop-2 {

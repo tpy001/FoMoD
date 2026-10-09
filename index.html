@@ -154,13 +154,12 @@
         </div>
       </div>
       <div class="figure-crop figure-crop-1">
-        <img src="./static/images/figure1.png" alt="Conceptual comparison between baseline policies and ForceLDM.">
+        <img src="./static/images/figure1.png?v=20261009" alt="Comparison of force-aware VLA, video-based world action models, and our method.">
       </div>
       <p class="figure-caption has-text-left">
-        <strong>Figure 1.</strong> Comparison between baseline methods and ForceLDM. Baselines directly map current
-        observations to actions, which can cause modality collapse and limited generalization, while ForceLDM
-        distills future force and motion representations to make the student learn physical interaction dynamics
-        that guide action generation.
+        <strong>Figure 1.</strong> Conceptual comparison. Force-aware VLAs react directly from current observations,
+        while video-based world action models explicitly predict future frames. Our method distills future force and
+        motion into a student policy, providing physical foresight without future prediction at deployment.
       </p>
     </div>
   </div>
